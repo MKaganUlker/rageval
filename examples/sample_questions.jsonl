@@ -1,0 +1,3 @@
+{"id":"q1","question":"What does RAG combine?","expected_answer":"RAG combines retrieval with text generation.","expected_document_ids":["doc-rag-001"]}
+{"id":"q2","question":"Which retrieval metrics can evaluate a RAG system?","expected_answer":"Hit rate, recall at k, precision at k, and mean reciprocal rank are retrieval metrics.","expected_document_ids":["doc-eval-001"]}
+{"id":"q3","question":"Why does chunk size matter?","expected_answer":"Chunk size affects retrieval quality, latency, and cost.","expected_document_ids":["doc-chunk-001"]}
