@@ -10,6 +10,7 @@ from rich.table import Table
 from rageval.chunking.fixed import FixedSizeChunker
 from rageval.core.config import RagevalConfig
 from rageval.datasets.jsonl import load_documents, load_examples
+from rageval.datasets.starter import create_starter_dataset
 from rageval.embeddings.hash import HashEmbeddingModel
 from rageval.evaluators.runner import EvaluationRunner
 from rageval.reports.markdown import write_markdown_report
@@ -100,6 +101,34 @@ def validate(
 
     if not validation_report.is_valid:
         raise typer.Exit(code=1)
+
+
+@app.command("init-dataset")
+def init_dataset(
+    output: Annotated[
+        Path,
+        typer.Option("--output", "-o", help="Directory where starter dataset files are created."),
+    ],
+    overwrite: Annotated[
+        bool,
+        typer.Option("--overwrite", help="Overwrite existing starter dataset files."),
+    ] = False,
+) -> None:
+    try:
+        documents_path, questions_path = create_starter_dataset(
+            output_dir=output,
+            overwrite=overwrite,
+        )
+    except FileExistsError as exc:
+        console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    table = Table(title="Starter Dataset Created")
+    table.add_column("File", style="bold")
+    table.add_column("Path")
+    table.add_row("Documents", str(documents_path))
+    table.add_row("Questions", str(questions_path))
+    console.print(table)
 
 
 @app.command()

@@ -77,3 +77,13 @@ report:
     assert result.exit_code == 0
     assert (output_dir / "cli_test.json").exists()
     assert (output_dir / "cli_test.md").exists()
+
+
+def test_cli_init_dataset_command_creates_files(tmp_path: Path) -> None:
+    output_dir = tmp_path / "starter"
+
+    result = runner.invoke(app, ["init-dataset", "--output", str(output_dir)])
+
+    assert result.exit_code == 0
+    assert (output_dir / "documents.jsonl").exists()
+    assert (output_dir / "questions.jsonl").exists()
