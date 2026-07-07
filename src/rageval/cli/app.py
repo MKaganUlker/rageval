@@ -16,11 +16,39 @@ from rageval.embeddings.hash import HashEmbeddingModel
 from rageval.evaluators.runner import EvaluationRunner
 from rageval.reports.markdown import write_markdown_report
 from rageval.retrievers.dense import DenseRetriever
-from rageval.validation.dataset import validate_dataset
+from rageval.validation.config import validate_config_file, validate_config_values
+from rageval.validation.dataset import ValidationIssue, validate_dataset
 from rageval.vectorstores.memory import InMemoryVectorStore
 
 app = typer.Typer(help="Evaluate Retrieval-Augmented Generation systems.")
 console = Console()
+
+
+def _print_issues(title: str, issues: list[ValidationIssue]) -> None:
+    table = Table(title=title)
+    table.add_column("Level", style="bold")
+    table.add_column("Message")
+
+    for issue in issues:
+        table.add_row(issue.level, issue.message)
+
+    console.print(table)
+
+
+def _load_validated_config(config_path: Path) -> RagevalConfig:
+    file_report = validate_config_file(config_path)
+    if not file_report.is_valid:
+        _print_issues("Config Validation", file_report.issues)
+        raise typer.Exit(code=1)
+
+    cfg = RagevalConfig.from_yaml(config_path)
+
+    value_report = validate_config_values(cfg)
+    if not value_report.is_valid:
+        _print_issues("Config Validation", value_report.issues)
+        raise typer.Exit(code=1)
+
+    return cfg
 
 
 @app.command()
@@ -30,7 +58,7 @@ def run(
         typer.Option("--config", "-c", help="Path to a rageval YAML config."),
     ],
 ) -> None:
-    cfg = RagevalConfig.from_yaml(config)
+    cfg = _load_validated_config(config)
 
     documents = load_documents(cfg.dataset.documents_path)
     examples = load_examples(cfg.dataset.questions_path)
@@ -38,8 +66,7 @@ def run(
     validation_report = validate_dataset(documents=documents, examples=examples)
     if not validation_report.is_valid:
         console.print("[bold red]Dataset validation failed.[/bold red]")
-        for issue in validation_report.issues:
-            console.print(f"[{issue.level}] {issue.message}")
+        _print_issues("Dataset Validation", validation_report.issues)
         raise typer.Exit(code=1)
 
     chunker = FixedSizeChunker(
@@ -82,25 +109,38 @@ def validate(
         typer.Option("--config", "-c", help="Path to a rageval YAML config."),
     ],
 ) -> None:
+    file_report = validate_config_file(config)
+    if not file_report.is_valid:
+        _print_issues("Config Validation", file_report.issues)
+        raise typer.Exit(code=1)
+
     cfg = RagevalConfig.from_yaml(config)
+
+    config_report = validate_config_values(cfg)
+    if not config_report.is_valid:
+        _print_issues("Config Validation", config_report.issues)
+        raise typer.Exit(code=1)
+
     documents = load_documents(cfg.dataset.documents_path)
     examples = load_examples(cfg.dataset.questions_path)
 
-    validation_report = validate_dataset(documents=documents, examples=examples)
+    dataset_report = validate_dataset(documents=documents, examples=examples)
 
-    table = Table(title="Dataset Validation")
+    all_issues = config_report.issues + dataset_report.issues
+
+    table = Table(title="Validation")
     table.add_column("Level", style="bold")
     table.add_column("Message")
 
-    if not validation_report.issues:
-        table.add_row("success", "Dataset is valid.")
+    if not all_issues:
+        table.add_row("success", "Config and dataset are valid.")
     else:
-        for issue in validation_report.issues:
+        for issue in all_issues:
             table.add_row(issue.level, issue.message)
 
     console.print(table)
 
-    if not validation_report.is_valid:
+    if not dataset_report.is_valid:
         raise typer.Exit(code=1)
 
 
@@ -130,6 +170,7 @@ def init_dataset(
     table.add_row("Documents", str(documents_path))
     table.add_row("Questions", str(questions_path))
     console.print(table)
+
 
 @app.command("init-config")
 def init_config(
@@ -165,6 +206,7 @@ def init_config(
     table.add_column("Path")
     table.add_row("Config", str(config_path))
     console.print(table)
+
 
 @app.command()
 def version() -> None:

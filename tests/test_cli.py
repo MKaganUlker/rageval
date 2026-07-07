@@ -21,7 +21,7 @@ def test_cli_validate_command_passes_for_baseline_config() -> None:
     result = runner.invoke(app, ["validate", "--config", "configs/baseline.yaml"])
 
     assert result.exit_code == 0
-    assert "Dataset is valid" in result.stdout
+    assert "Config and dataset are valid" in result.stdout
 
 
 def test_cli_run_command_generates_reports(tmp_path: Path) -> None:
