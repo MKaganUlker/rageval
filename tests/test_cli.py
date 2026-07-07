@@ -87,3 +87,22 @@ def test_cli_init_dataset_command_creates_files(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert (output_dir / "documents.jsonl").exists()
     assert (output_dir / "questions.jsonl").exists()
+
+
+def test_cli_init_config_command_creates_config_file(tmp_path: Path) -> None:
+    output_path = tmp_path / "config.yaml"
+    dataset_dir = tmp_path / "dataset"
+
+    result = runner.invoke(
+        app,
+        [
+            "init-config",
+            "--output",
+            str(output_path),
+            "--dataset-dir",
+            str(dataset_dir),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert output_path.exists()

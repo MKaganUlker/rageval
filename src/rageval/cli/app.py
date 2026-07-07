@@ -9,6 +9,7 @@ from rich.table import Table
 
 from rageval.chunking.fixed import FixedSizeChunker
 from rageval.core.config import RagevalConfig
+from rageval.core.starter_config import create_starter_config
 from rageval.datasets.jsonl import load_documents, load_examples
 from rageval.datasets.starter import create_starter_dataset
 from rageval.embeddings.hash import HashEmbeddingModel
@@ -130,6 +131,40 @@ def init_dataset(
     table.add_row("Questions", str(questions_path))
     console.print(table)
 
+@app.command("init-config")
+def init_config(
+    output: Annotated[
+        Path,
+        typer.Option("--output", "-o", help="Path where the YAML config is created."),
+    ],
+    dataset_dir: Annotated[
+        Path,
+        typer.Option(
+            "--dataset-dir",
+            "-d",
+            help="Directory containing documents.jsonl and questions.jsonl.",
+        ),
+    ],
+    overwrite: Annotated[
+        bool,
+        typer.Option("--overwrite", help="Overwrite existing config file."),
+    ] = False,
+) -> None:
+    try:
+        config_path = create_starter_config(
+            output_path=output,
+            dataset_dir=dataset_dir,
+            overwrite=overwrite,
+        )
+    except FileExistsError as exc:
+        console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    table = Table(title="Starter Config Created")
+    table.add_column("File", style="bold")
+    table.add_column("Path")
+    table.add_row("Config", str(config_path))
+    console.print(table)
 
 @app.command()
 def version() -> None:
