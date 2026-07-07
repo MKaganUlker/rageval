@@ -41,6 +41,6 @@ class RagevalConfig(BaseModel):
     report: ReportConfig = Field(default_factory=ReportConfig)
 
     @classmethod
-    def from_yaml(cls, path: str | Path) -> "RagevalConfig":
+    def from_yaml(cls, path: str | Path) -> RagevalConfig:
         raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
         return cls.model_validate(raw)

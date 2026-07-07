@@ -37,11 +37,13 @@ class EvaluationRunner:
                 )
             )
 
+        average_latency_ms = mean([result.latency_ms for result in results]) if results else 0
+
         return EvaluationRun(
             name=self.run_name,
             results=results,
             config={
                 "top_k": top_k,
-                "average_latency_ms": mean([result.latency_ms for result in results]) if results else 0,
+                "average_latency_ms": average_latency_ms,
             },
         )

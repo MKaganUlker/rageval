@@ -6,7 +6,12 @@ from rageval.vectorstores.memory import InMemoryVectorStore
 
 
 class DenseRetriever:
-    def __init__(self, embedding_model: EmbeddingModel, vector_store: InMemoryVectorStore, top_k: int = 5) -> None:
+    def __init__(
+        self,
+        embedding_model: EmbeddingModel,
+        vector_store: InMemoryVectorStore,
+        top_k: int = 5,
+    ) -> None:
         self.embedding_model = embedding_model
         self.vector_store = vector_store
         self.top_k = top_k

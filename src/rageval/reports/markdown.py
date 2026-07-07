@@ -48,7 +48,10 @@ def write_markdown_report(run: EvaluationRun, output_path: str | Path) -> None:
         lines.extend(["", "Top retrieved contexts:", ""])
         for context in result.retrieved_contexts[:3]:
             preview = context.text.replace("\n", " ")[:220]
-            lines.append(f"- Rank {context.rank}: `{context.document_id}` score={context.score:.4f} — {preview}...")
+            lines.append(
+                f"- Rank {context.rank}: `{context.document_id}` "
+                f"score={context.score:.4f} — {preview}..."
+            )
         lines.append("")
 
     output.write_text("\n".join(lines), encoding="utf-8")

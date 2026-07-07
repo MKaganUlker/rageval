@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -20,7 +21,12 @@ console = Console()
 
 
 @app.command()
-def run(config: Path = typer.Option(..., "--config", "-c", help="Path to a rageval YAML config.")) -> None:
+def run(
+    config: Annotated[
+        Path,
+        typer.Option("--config", "-c", help="Path to a rageval YAML config."),
+    ],
+) -> None:
     cfg = RagevalConfig.from_yaml(config)
 
     documents = load_documents(cfg.dataset.documents_path)
@@ -64,6 +70,7 @@ def version() -> None:
     from rageval import __version__
 
     console.print(__version__)
+
 
 if __name__ == "__main__":
     app()
