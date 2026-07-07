@@ -14,6 +14,7 @@ from rageval.embeddings.hash import HashEmbeddingModel
 from rageval.evaluators.runner import EvaluationRunner
 from rageval.reports.markdown import write_markdown_report
 from rageval.retrievers.dense import DenseRetriever
+from rageval.validation.dataset import validate_dataset
 from rageval.vectorstores.memory import InMemoryVectorStore
 
 app = typer.Typer(help="Evaluate Retrieval-Augmented Generation systems.")
@@ -31,6 +32,13 @@ def run(
 
     documents = load_documents(cfg.dataset.documents_path)
     examples = load_examples(cfg.dataset.questions_path)
+
+    validation_report = validate_dataset(documents=documents, examples=examples)
+    if not validation_report.is_valid:
+        console.print("[bold red]Dataset validation failed.[/bold red]")
+        for issue in validation_report.issues:
+            console.print(f"[{issue.level}] {issue.message}")
+        raise typer.Exit(code=1)
 
     chunker = FixedSizeChunker(
         chunk_size=cfg.chunking.chunk_size,
@@ -63,6 +71,35 @@ def run(
     table.add_row("JSON", str(json_path))
     table.add_row("Markdown", str(markdown_path))
     console.print(table)
+
+
+@app.command()
+def validate(
+    config: Annotated[
+        Path,
+        typer.Option("--config", "-c", help="Path to a rageval YAML config."),
+    ],
+) -> None:
+    cfg = RagevalConfig.from_yaml(config)
+    documents = load_documents(cfg.dataset.documents_path)
+    examples = load_examples(cfg.dataset.questions_path)
+
+    validation_report = validate_dataset(documents=documents, examples=examples)
+
+    table = Table(title="Dataset Validation")
+    table.add_column("Level", style="bold")
+    table.add_column("Message")
+
+    if not validation_report.issues:
+        table.add_row("success", "Dataset is valid.")
+    else:
+        for issue in validation_report.issues:
+            table.add_row(issue.level, issue.message)
+
+    console.print(table)
+
+    if not validation_report.is_valid:
+        raise typer.Exit(code=1)
 
 
 @app.command()
