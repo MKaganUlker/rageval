@@ -77,7 +77,7 @@ Generation quality metrics, LLM-as-judge evaluation, FAISS/Chroma integrations, 
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/rageval.git
+git clone https://github.com/MKaganUlker/rageval.git
 cd rageval
 ```
 
