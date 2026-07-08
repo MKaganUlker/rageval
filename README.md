@@ -1,16 +1,27 @@
 # RAGEval
 
-![Tests](https://github.com/MKaganUlker/rageval/actions/workflows/tests.yml/badge.svg)
+[![CI](https://github.com/MKaganUlker/rageval/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MKaganUlker/rageval/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Code style](https://img.shields.io/badge/code%20style-ruff-black)
+![Linting](https://img.shields.io/badge/linting-ruff-purple)
 ![Type checked](https://img.shields.io/badge/type%20checked-mypy-blue)
 
 **RAGEval** is a professional evaluation framework for Retrieval-Augmented Generation systems.
 
-It helps AI engineers benchmark RAG pipelines across retrieval quality, latency, configuration choices, and reproducibility.
+It helps developers and AI engineers benchmark RAG pipelines across retrieval quality, configuration choices, and reproducibility.
 
-The project starts with a clean offline baseline that works without external API keys. It is designed to grow into a full RAG evaluation platform with multiple embedding models, vector stores, retrievers, generation metrics, and experiment comparison tools.
+The project starts with a clean offline baseline that works without external API keys. It is designed to grow into a full RAG evaluation platform with multiple embedding models, vector stores, retrievers, generation metrics, latency tracking, and experiment comparison tools.
+
+## Quick demo
+
+Create a sample dataset, generate a config, validate it, and run an evaluation:
+
+```bash
+rageval init-dataset --output data/demo_dataset
+rageval init-config --output configs/demo.yaml --dataset-dir data/demo_dataset
+rageval validate --config configs/demo.yaml
+rageval run --config configs/demo.yaml
+```
 
 ## Why this project exists
 
@@ -30,7 +41,9 @@ The goal is not only to build a RAG pipeline, but to evaluate one like an engine
 
 ## Current project status
 
-RAGEval is currently in early development.
+RAGEval is currently focused on offline retrieval evaluation and developer workflow quality.
+
+The current version provides a working baseline for evaluating retrieval performance without external API keys. It supports dataset/config validation, chunking, offline embeddings, dense retrieval, retrieval metrics, CLI workflows, Markdown/JSON reports, and CI-tested development.
 
 The current version focuses on **retrieval evaluation** and **developer workflow**:
 
@@ -77,6 +90,35 @@ Generation quality metrics, LLM-as-judge evaluation, FAISS/Chroma integrations, 
 * Changelog
 * Contribution guide
 * Release checklist
+
+## What this project demonstrates
+
+RAGEval demonstrates practical AI engineering and Python tooling skills:
+
+* building an installable Python package
+* designing typed schemas with Pydantic
+* creating developer-friendly CLI commands with Typer
+* validating datasets and YAML configuration files
+* implementing retrieval metrics from scratch
+* generating reproducible JSON and Markdown reports
+* testing CLI workflows with pytest
+* enforcing code quality with Ruff, mypy, and GitHub Actions
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[JSONL Documents] --> B[Dataset Loader]
+    C[JSONL Questions] --> B
+    B --> D[Chunker]
+    D --> E[Embedding Model]
+    E --> F[Vector Store]
+    F --> G[Retriever]
+    G --> H[Retrieval Evaluator]
+    H --> I[Metrics]
+    I --> J[JSON Report]
+    I --> K[Markdown Report]
+```
 
 ## Installation
 
@@ -408,6 +450,16 @@ rageval/
 └── README.md
 ```
 
+## Design goals
+
+RAGEval is designed around a few practical engineering goals:
+
+* **Offline-first baseline:** the default evaluation flow works without paid APIs or external services.
+* **Reproducibility:** datasets, configs, metrics, and reports are versionable.
+* **Extensibility:** embeddings, retrievers, vector stores, and evaluators are designed to be replaceable.
+* **Developer workflow:** validation, CLI commands, tests, linting, typing, and CI are part of the project from the beginning.
+* **Measurable quality:** the project focuses on retrieval quality and failure analysis instead of only building a demo chatbot.
+
 ## Roadmap
 
 ### v0.1 — Offline retrieval evaluation
@@ -469,10 +521,6 @@ rageval/
 * [ ] Reproducible reports
 * [ ] Experiment comparison
 * [ ] CI-tested professional workflow
-
-## Example CV bullet
-
-> Built RAGEval, a modular Python framework for evaluating Retrieval-Augmented Generation pipelines with configurable datasets, chunking, embeddings, vector search, retrieval metrics, validation tooling, reproducible reports, automated tests, and CI/CD.
 
 ## License
 
