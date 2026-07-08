@@ -8,15 +8,28 @@ This project follows a simple versioned changelog format.
 
 ### Added
 
-- Configuration validation checks.
+### Changed
+
+### Fixed
+
+## [0.2.0] - 2026-07-08
+
+### Added
+
 - Dataset validation command.
+- Configuration validation checks.
 - Starter dataset generator.
 - Starter config generator.
 - CLI integration tests.
+- Changelog.
+- Contribution guide.
+- Release checklist.
+- Updated README with the current v0.2 workflow.
 
 ### Changed
 
 - Improved CLI validation flow with clearer error messages.
+- Updated roadmap to reflect the current project direction.
 
 ## [0.1.0] - Initial Retrieval Evaluation Baseline
 
