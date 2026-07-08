@@ -1,5 +1,11 @@
 # RAGEval
 
+![Tests](https://github.com/MKaganUlker/rageval/actions/workflows/tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Code style](https://img.shields.io/badge/code%20style-ruff-black)
+![Type checked](https://img.shields.io/badge/type%20checked-mypy-blue)
+
 **RAGEval** is a professional evaluation framework for Retrieval-Augmented Generation systems.
 
 It helps AI engineers benchmark RAG pipelines across retrieval quality, latency, configuration choices, and reproducibility.
